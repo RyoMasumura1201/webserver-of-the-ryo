@@ -24,16 +24,21 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		request, err := http.ReadRequest(bufio.NewReader(conn))
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		f, err := os.Create("request.txt")
-		fmt.Println("read Request")
-		bytes, err := json.Marshal(request.Header)
-		f.Write(bytes)
+		
+		go handleRequest(conn)
 
 	}
+}
+
+func handleRequest(conn net.Conn) {
+	request, err := http.ReadRequest(bufio.NewReader(conn))
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	f, err := os.Create("request.txt")
+	fmt.Println("read Request")
+	bytes, err := json.Marshal(request.Header)
+	f.Write(bytes)
 }
