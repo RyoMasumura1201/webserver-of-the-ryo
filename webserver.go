@@ -41,4 +41,5 @@ func handleRequest(conn net.Conn) {
 	fmt.Println("read Request")
 	bytes, err := json.Marshal(request.Header)
 	f.Write(bytes)
+	conn.Close()
 }
