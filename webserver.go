@@ -31,10 +31,9 @@ func main() {
 		}
 
 		f, err := os.Create("request.txt")
+		fmt.Println("read Request")
 		bytes, err := json.Marshal(request.Header)
-		result, err := f.Write(bytes)
-
-		fmt.Println(result)
+		f.Write(bytes)
 
 	}
 }
