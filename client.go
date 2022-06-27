@@ -24,5 +24,6 @@ func main(){
 
     byteArray, _ := ioutil.ReadAll(response.Body)
     fmt.Println(string(byteArray))
+	response.Body.Close()
 	conn.Close()
 }
