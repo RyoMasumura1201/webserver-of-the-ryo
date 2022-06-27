@@ -1,12 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
-	"io/ioutil"
-	"bufio"
-	"log"
 )
 
 func main(){
@@ -24,4 +24,5 @@ func main(){
 
     byteArray, _ := ioutil.ReadAll(response.Body)
     fmt.Println(string(byteArray))
+	conn.Close()
 }
