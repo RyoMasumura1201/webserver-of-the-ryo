@@ -2,16 +2,26 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"io/ioutil"
+	"bufio"
+	"log"
 )
 
 func main(){
-	url := "http://localhost:80"
-	responsive, _ := http.Get(url)
+	url := "localhost:80"
 
-    defer responsive.Body.Close()
+	conn, err := net.Dial("tcp", url)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-    byteArray, _ := ioutil.ReadAll(responsive.Body)
+	request, err:= http.NewRequest("GET", "http://localhost:80", nil)
+	request.Write(conn)
+
+	response, err := http.ReadResponse(bufio.NewReader(conn), request)
+
+    byteArray, _ := ioutil.ReadAll(response.Body)
     fmt.Println(string(byteArray))
 }
