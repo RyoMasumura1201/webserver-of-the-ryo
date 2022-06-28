@@ -49,6 +49,9 @@ func handleRequest(conn net.Conn) {
 		ProtoMinor: 0,
 		Body : ioutil.NopCloser(strings.NewReader(("It works\n"))),
 	}
+	header := http.Header{}
+	header.Add("Content-Type", "text/html")
+	response.Header = header
 	response.Write(conn)
 	conn.Close()
 }
