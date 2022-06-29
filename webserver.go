@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -49,8 +50,12 @@ func handleRequest(conn net.Conn) {
 		ProtoMinor: 0,
 		Body : ioutil.NopCloser(strings.NewReader(("It works\n"))),
 	}
+
 	header := http.Header{}
 	header.Add("Content-Type", "text/html")
+	header.Add("Host", "webserver-of-the-ryo/0.1")
+	header.Add("Date", time.Now().Format(time.UnixDate))
+	header.Add("Connection", "Close")
 	response.Header = header
 	response.Write(conn)
 	conn.Close()
