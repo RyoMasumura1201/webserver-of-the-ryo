@@ -1,14 +1,11 @@
 package main
 
 import (
-	"bufio"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 )
@@ -34,16 +31,10 @@ func main() {
 }
 
 func handleRequest(conn net.Conn) {
-	request, err := http.ReadRequest(bufio.NewReader(conn))
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	f, err := os.Create("request.txt")
-	fmt.Println("read Request")
-	bytes, err := json.Marshal(request.Header)
-	f.Write(bytes)
+	data :=make([]byte, 1024)
+	count, _:= conn.Read(data)
+	fmt.Println(string(data[:count]))
+	
 	response := http.Response{
 		StatusCode: 200,
 		ProtoMajor: 1,
