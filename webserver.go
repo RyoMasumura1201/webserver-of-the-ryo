@@ -35,11 +35,13 @@ func handleRequest(conn net.Conn) {
 	count, _:= conn.Read(data)
 	fmt.Println(string(data[:count]))
 	
+	content := "It works\n"
 	response := http.Response{
 		StatusCode: 200,
 		ProtoMajor: 1,
 		ProtoMinor: 0,
-		Body : ioutil.NopCloser(strings.NewReader(("It works\n"))),
+		ContentLength: int64(len(content)),
+		Body : ioutil.NopCloser(strings.NewReader((content))),
 	}
 
 	header := http.Header{}
