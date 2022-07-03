@@ -50,13 +50,12 @@ func handleRequest(conn net.Conn) {
 
 	fmt.Println(responseContents)
 
-	content := "It works\n"
 	response := http.Response{
 		StatusCode: 200,
 		ProtoMajor: 1,
 		ProtoMinor: 0,
-		ContentLength: int64(len(content)),
-		Body : ioutil.NopCloser(strings.NewReader((content))),
+		ContentLength: int64(len(responseContents)),
+		Body : ioutil.NopCloser(strings.NewReader((responseContents))),
 	}
 
 	header := http.Header{}
@@ -86,7 +85,7 @@ func splitRequestLine(requestLine string)(method, path, version string){
 }
 
 func getResponseContents(path string)(string){
-	contents, err := ioutil.ReadFile(STATIC_PATH + path)
+	contents, err := ioutil.ReadFile(STATIC_PATH + "/index.html")
 
 	if err != nil {
 		panic(err)
