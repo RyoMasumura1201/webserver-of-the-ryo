@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -33,8 +34,11 @@ func main() {
 func handleRequest(conn net.Conn) {
 	data :=make([]byte, 1024)
 	count, _:= conn.Read(data)
-	fmt.Println(string(data[:count]))
-	
+	// fmt.Println(string(data[:count]))
+	request := string(data[:count])
+
+	requestElementList := splitRequest(request)
+	fmt.Println(requestElementList[0])
 	content := "It works\n"
 	response := http.Response{
 		StatusCode: 200,
@@ -52,4 +56,12 @@ func handleRequest(conn net.Conn) {
 	response.Header = header
 	response.Write(conn)
 	conn.Close()
+}
+
+func splitRequest(request string)([]string){
+	reg := "\r\n|\n"
+
+	requestElementList := regexp.MustCompile(reg).Split(request, -1)
+
+	return requestElementList
 }
