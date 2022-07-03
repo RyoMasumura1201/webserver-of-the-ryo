@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+const STATIC_PATH ="static"
+
 func main() {
 	fmt.Println("server start🚀")
 	ln, err := net.Listen("tcp", ":8080")
@@ -43,6 +45,10 @@ func handleRequest(conn net.Conn) {
 
 	_, path, _ := splitRequestLine(requestLine)
 	fmt.Println(path)
+
+	responseContents := getResponseContents(path)
+
+	fmt.Println(responseContents)
 
 	content := "It works\n"
 	response := http.Response{
@@ -77,4 +83,14 @@ func splitRequestLine(requestLine string)(method, path, version string){
 	path = requestLineList[1]
 	version = requestLineList[2]
 	return
+}
+
+func getResponseContents(path string)(string){
+	contents, err := ioutil.ReadFile(STATIC_PATH + path)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return string(contents)
 }
