@@ -34,11 +34,16 @@ func main() {
 func handleRequest(conn net.Conn) {
 	data :=make([]byte, 1024)
 	count, _:= conn.Read(data)
-	// fmt.Println(string(data[:count]))
+	fmt.Println(string(data[:count]))
 	request := string(data[:count])
 
 	requestElementList := splitRequest(request)
+	requestLine := requestElementList[0]
 	fmt.Println(requestElementList[0])
+
+	_, path, _ := splitRequestLine(requestLine)
+	fmt.Println(path)
+
 	content := "It works\n"
 	response := http.Response{
 		StatusCode: 200,
@@ -64,4 +69,12 @@ func splitRequest(request string)([]string){
 	requestElementList := regexp.MustCompile(reg).Split(request, -1)
 
 	return requestElementList
+}
+
+func splitRequestLine(requestLine string)(method, path, version string){
+	requestLineList := strings.Split(requestLine, " ")
+	method = requestLineList[0]
+	path = requestLineList[1]
+	version = requestLineList[2]
+	return
 }
