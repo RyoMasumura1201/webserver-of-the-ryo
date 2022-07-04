@@ -13,9 +13,6 @@ import (
 
 const STATIC_PATH = "static"
 
-type Mime struct {
-}
-
 func main() {
 	fmt.Println("server start🚀")
 	ln, err := net.Listen("tcp", ":8080")
@@ -81,7 +78,21 @@ func makeResponse(path string) http.Response {
 
 	responseContents, err := getResponseContents(path)
 
+	mime := getMimeMap()
+	var ext string
+	if strings.Contains(path, ".") {
+		array := strings.Split(path, ".")
+		ext = array[len(array)-1]
+	} else {
+		ext = ""
+	}
+
 	var response http.Response
+
+	header := http.Header{}
+	header.Add("Host", "webserver-of-the-ryo/0.1")
+	header.Add("Date", time.Now().Format(time.UnixDate))
+	header.Add("Connection", "Close")
 
 	if err != nil {
 		responseContents = "<html><body><h1>404 Not Found</h1></body></html>"
@@ -92,6 +103,8 @@ func makeResponse(path string) http.Response {
 			ContentLength: int64(len(responseContents)),
 			Body:          ioutil.NopCloser(strings.NewReader((responseContents))),
 		}
+
+		header.Add("Content-Type", "text/html")
 	} else {
 		response = http.Response{
 			StatusCode:    200,
@@ -101,16 +114,30 @@ func makeResponse(path string) http.Response {
 			Body:          ioutil.NopCloser(strings.NewReader((responseContents))),
 		}
 
+		contentType, isExists := mime[ext]
+
+		if isExists {
+			header.Add("Content-Type", contentType)
+		} else {
+			header.Add("Content-Type", "application/octet-stream")
+		}
 	}
 
 	fmt.Println(responseContents)
 
-	header := http.Header{}
-	header.Add("Content-Type", "text/html")
-	header.Add("Host", "webserver-of-the-ryo/0.1")
-	header.Add("Date", time.Now().Format(time.UnixDate))
-	header.Add("Connection", "Close")
 	response.Header = header
 
 	return response
+}
+
+func getMimeMap() map[string]string {
+	mime := make(map[string]string)
+	mime["html"] = "text/html"
+	mime["css"] = "text/css"
+	mime["png"] = "image/png"
+	mime["jpg"] = "image/jpg"
+	mime["gif"] = "image/gif"
+	mime["ico"] = "image/x-icon"
+
+	return mime
 }
