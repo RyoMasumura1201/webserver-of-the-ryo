@@ -76,6 +76,28 @@ func getResponseContents(path string) (string, error) {
 
 func makeResponse(path string) http.Response {
 
+	header := http.Header{}
+	header.Add("Host", "webserver-of-the-ryo/0.1")
+	header.Add("Date", time.Now().Format(time.UnixDate))
+	header.Add("Connection", "Close")
+
+	if path == "/now" {
+		responseContents := "<html><body><h1>Now: " + time.Now().Format(time.UnixDate) + "</h1></body></html>"
+
+		response := http.Response{
+			StatusCode:    200,
+			ProtoMajor:    1,
+			ProtoMinor:    0,
+			ContentLength: int64(len(responseContents)),
+			Body:          ioutil.NopCloser(strings.NewReader((responseContents))),
+		}
+
+		header.Add("Content-Type", "text/html")
+		response.Header = header
+
+		return response
+	}
+
 	responseContents, err := getResponseContents(path)
 
 	mime := getMimeMap()
@@ -88,11 +110,6 @@ func makeResponse(path string) http.Response {
 	}
 
 	var response http.Response
-
-	header := http.Header{}
-	header.Add("Host", "webserver-of-the-ryo/0.1")
-	header.Add("Date", time.Now().Format(time.UnixDate))
-	header.Add("Connection", "Close")
 
 	if err != nil {
 		responseContents = "<html><body><h1>404 Not Found</h1></body></html>"
