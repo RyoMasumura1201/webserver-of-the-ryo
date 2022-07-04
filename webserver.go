@@ -11,7 +11,10 @@ import (
 	"time"
 )
 
-const STATIC_PATH ="static"
+const STATIC_PATH = "static"
+
+type Mime struct {
+}
 
 func main() {
 	fmt.Println("server start🚀")
@@ -27,15 +30,15 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		
+
 		go handleRequest(conn)
 
 	}
 }
 
 func handleRequest(conn net.Conn) {
-	data :=make([]byte, 1024)
-	count, _:= conn.Read(data)
+	data := make([]byte, 1024)
+	count, _ := conn.Read(data)
 	fmt.Println(string(data[:count]))
 	request := string(data[:count])
 
@@ -47,12 +50,12 @@ func handleRequest(conn net.Conn) {
 	fmt.Println(path)
 
 	response := makeResponse(path)
-	
+
 	response.Write(conn)
 	conn.Close()
 }
 
-func splitRequest(request string)([]string){
+func splitRequest(request string) []string {
 	reg := "\r\n|\n"
 
 	requestElementList := regexp.MustCompile(reg).Split(request, -1)
@@ -60,7 +63,7 @@ func splitRequest(request string)([]string){
 	return requestElementList
 }
 
-func splitRequestLine(requestLine string)(method, path, version string){
+func splitRequestLine(requestLine string) (method, path, version string) {
 	requestLineList := strings.Split(requestLine, " ")
 	method = requestLineList[0]
 	path = requestLineList[1]
@@ -68,34 +71,34 @@ func splitRequestLine(requestLine string)(method, path, version string){
 	return
 }
 
-func getResponseContents(path string)(string, error){
+func getResponseContents(path string) (string, error) {
 	contents, err := ioutil.ReadFile(STATIC_PATH + path)
 
 	return string(contents), err
 }
 
-func makeResponse(path string)(http.Response){
+func makeResponse(path string) http.Response {
 
 	responseContents, err := getResponseContents(path)
 
 	var response http.Response
 
-	if err !=nil {
+	if err != nil {
 		responseContents = "<html><body><h1>404 Not Found</h1></body></html>"
 		response = http.Response{
-			StatusCode: 404,
-			ProtoMajor: 1,
-			ProtoMinor: 0,
+			StatusCode:    404,
+			ProtoMajor:    1,
+			ProtoMinor:    0,
 			ContentLength: int64(len(responseContents)),
-			Body : ioutil.NopCloser(strings.NewReader((responseContents))),
+			Body:          ioutil.NopCloser(strings.NewReader((responseContents))),
 		}
 	} else {
 		response = http.Response{
-			StatusCode: 200,
-			ProtoMajor: 1,
-			ProtoMinor: 0,
+			StatusCode:    200,
+			ProtoMajor:    1,
+			ProtoMinor:    0,
 			ContentLength: int64(len(responseContents)),
-			Body : ioutil.NopCloser(strings.NewReader((responseContents))),
+			Body:          ioutil.NopCloser(strings.NewReader((responseContents))),
 		}
 
 	}
