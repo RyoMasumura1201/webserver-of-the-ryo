@@ -46,11 +46,7 @@ func handleRequest(conn net.Conn) {
 	_, path, _ := splitRequestLine(requestLine)
 	fmt.Println(path)
 
-	responseContents := getResponseContents(path)
-
-	fmt.Println(responseContents)
-
-	response := makeResponse(responseContents)
+	response := makeResponse(path)
 	
 	response.Write(conn)
 	conn.Close()
@@ -72,24 +68,39 @@ func splitRequestLine(requestLine string)(method, path, version string){
 	return
 }
 
-func getResponseContents(path string)(string){
+func getResponseContents(path string)(string, error){
 	contents, err := ioutil.ReadFile(STATIC_PATH + path)
 
-	if err != nil {
-		panic(err)
-	}
-
-	return string(contents)
+	return string(contents), err
 }
 
-func makeResponse(responseContents string)(http.Response){
-	response := http.Response{
-		StatusCode: 200,
-		ProtoMajor: 1,
-		ProtoMinor: 0,
-		ContentLength: int64(len(responseContents)),
-		Body : ioutil.NopCloser(strings.NewReader((responseContents))),
+func makeResponse(path string)(http.Response){
+
+	responseContents, err := getResponseContents(path)
+
+	var response http.Response
+
+	if err !=nil {
+		responseContents = "<html><body><h1>404 Not Found</h1></body></html>"
+		response = http.Response{
+			StatusCode: 404,
+			ProtoMajor: 1,
+			ProtoMinor: 0,
+			ContentLength: int64(len(responseContents)),
+			Body : ioutil.NopCloser(strings.NewReader((responseContents))),
+		}
+	} else {
+		response = http.Response{
+			StatusCode: 200,
+			ProtoMajor: 1,
+			ProtoMinor: 0,
+			ContentLength: int64(len(responseContents)),
+			Body : ioutil.NopCloser(strings.NewReader((responseContents))),
+		}
+
 	}
+
+	fmt.Println(responseContents)
 
 	header := http.Header{}
 	header.Add("Content-Type", "text/html")
